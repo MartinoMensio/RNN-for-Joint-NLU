@@ -18,9 +18,9 @@ intent_size = 22
 epoch_num = 20
 
 
-def get_model(train_data_ed):
+def get_model(vocabs):
     model = Model(input_steps, embedding_size, hidden_size, vocab_size, slot_size,
-                 intent_size, epoch_num, train_data_ed, batch_size, n_layers)
+                 intent_size, epoch_num, vocabs, batch_size, n_layers)
     model.build()
     return model
 
@@ -30,13 +30,10 @@ def train(is_debug=False):
     test_data = open("dataset/atis-2.dev.w-intent.iob", "r").readlines()
     train_data_ed = data_pipeline(train_data)
     test_data_ed = data_pipeline(test_data)
-    #word2index, index2word, slot2index, index2slot, intent2index, index2intent = \
-    #    get_info_from_training_data(train_data_ed)
-
-    #index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
-    #index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
-
-    model = get_model(train_data_ed)
+    # get the vocabularies for input, slot and intent
+    vocabs = get_vocabularies(train_data_ed)
+    # and get a model for them
+    model = get_model(vocabs)
     sess = tf.Session()
     if is_debug:
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
